@@ -3,7 +3,8 @@
     public class Causes
     {
         public int Id { get; set; }
-        public string CauseName { get; set; }
+        public string UserName { get; set; }
+        public int Rating { get; set; }
         public string Depcription { get; set; }
         public DateTime CreateTime { get; set; }
         public DateTime UpdateTime { get; set; }

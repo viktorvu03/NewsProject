@@ -36,7 +36,8 @@ namespace Ngo_Project3_Api.Controllers
                             causes.Add(new Causes
                             {
                                 Id = reader.GetInt32("ID"),
-                                CauseName = reader.GetString("CAUSE_NAME"),
+                                UserName = reader.GetString("USER_NAME"),
+                                Rating = reader.GetInt32("RATING"),
                                 Depcription = reader.GetString("DESCRIPTION"),
                                 CreateTime = reader.GetDateTime("CREATE_TIME"),
                                 UpdateTime = reader.GetDateTime("UPDATE_TIME")
@@ -61,10 +62,11 @@ namespace Ngo_Project3_Api.Controllers
                 using (var connection = new MySqlConnection(_connectionString))
                 {
                     await connection.OpenAsync();
-                    string query2 = "INSERT INTO causes (CAUSE_NAME, DESCRIPTION, CREATE_TIME, UPDATE_TIME) VALUES (@CauseName, @Descreption, @CreateTime, @UpdateTime)";
+                    string query2 = "INSERT INTO causes (USER_NAME, RATING, DESCRIPTION, CREATE_TIME, UPDATE_TIME) VALUES (@UserName,@Rating, @Descreption, @CreateTime, @UpdateTime)";
                     using (var command = new MySqlCommand(query2, connection))
                     {
-                        command.Parameters.AddWithValue("@CauseName", cause.CauseName);
+                        command.Parameters.AddWithValue("@UserName", cause.UserName);
+                        command.Parameters.AddWithValue("@Rating", cause.Rating);
                         command.Parameters.AddWithValue("@Descreption", cause.Depcription);
                         command.Parameters.AddWithValue("@CreateTime", DateTime.UtcNow);
                         command.Parameters.AddWithValue("@UpdateTime", DateTime.UtcNow);
@@ -106,11 +108,12 @@ namespace Ngo_Project3_Api.Controllers
             using (var connection = new MySqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
-                string query = "UPDATE causes SET CAUSE_NAME = @CauseName, DESCRIPTION = @Descreption, UPDATE_TIME = @UpdateTime WHERE ID = @Id";
+                string query = "UPDATE causes SET USER_NAME = @UserName,RATING = @Rating, DESCRIPTION = @Descreption, UPDATE_TIME = @UpdateTime WHERE ID = @Id";
                 using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Id", cause.Id);
-                    command.Parameters.AddWithValue("@CauseName", cause.CauseName);
+                    command.Parameters.AddWithValue("@UserName", cause.UserName);
+                    command.Parameters.AddWithValue("@Rating", cause.Rating);
                     command.Parameters.AddWithValue("@Descreption", cause.Depcription);
                     command.Parameters.AddWithValue("@UpdateTime", DateTime.UtcNow);
 
