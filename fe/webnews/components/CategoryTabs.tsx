@@ -2,50 +2,32 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-
-type Article = {
-  id: number;
-  title: string;
-  excerpt: string;
-  time: string;
-  image: string;
-};
-
-const CATEGORIES = [
-  { key: "all", label: "Tất cả" },
-  { key: "chinh-tri", label: "Chính trị" },
-  { key: "kinh-te", label: "Kinh tế" },
-  { key: "cong-nghe", label: "Công nghệ" },
-  { key: "the-thao", label: "Thể thao" },
-];
-
-function mapArticleToCategory(a: Article) {
-  // Deterministic mapping for mock data: distribute by id
-  const idx = a.id % (CATEGORIES.length - 1); // exclude 'all'
-  return CATEGORIES[idx + 1].key;
-}
+import { APIPost } from "@/services/APIPost";
+import { Post as PostType } from "@/types/Post";
+import { formatDate } from "@/Utils/formatDate";
 
 export default function CategoryTabs({
   localArticles = [],
   categories,
   paramName = "categoryId",
 }: {
-  localArticles?: Article[];
-  /**
-   * categories will be fetched by the header in the future.
-   * Each category should have an `id` (string) and `label`.
-   */
+  localArticles?: PostType[];
+
   categories?: { id: string; label: string }[];
-  /** query param name to read/write selected category id */
   paramName?: string;
 }) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const param = searchParams?.get(paramName) ?? "";
 
-  const [active, setActive] = useState<string>(param);
-  const [posts, setPosts] = useState<Article[]>(localArticles);
+  const [active, setActive] = useState<string>("");
+  const [allPosts, setAllPosts] = useState<PostType[]>(
+    localArticles as PostType[]
+  );
+  const [posts, setPosts] = useState<PostType[]>(localArticles as PostType[]);
   const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState<number>(1);
+  const PAGE_SIZE = 10;
 
   useEffect(() => {
     setActive(param);
@@ -53,30 +35,45 @@ export default function CategoryTabs({
 
   useEffect(() => {
     let cancelled = false;
-    async function load() {
+    async function loadAll() {
       setLoading(true);
       try {
-        const q = active ? `?${paramName}=${encodeURIComponent(active)}` : "";
-        const res = await fetch(`/api/posts${q}`, { cache: "no-store" });
-        if (!cancelled && res.ok) {
-          const data = await res.json();
-          if (!cancelled && Array.isArray(data)) setPosts(data);
-          else if (!cancelled) setPosts(localArticles);
-        } else if (!cancelled) {
-          setPosts(localArticles);
+        const data: PostType[] = await APIPost.getAllPost();
+        if (cancelled) return;
+        if (Array.isArray(data) && data.length > 0) {
+          setAllPosts(data as PostType[]);
+        } else {
+          setAllPosts(localArticles as PostType[]);
         }
       } catch (err) {
-        if (!cancelled) setPosts(localArticles);
+        console.error("APIPost.getAllPost failed:", err);
+        if (!cancelled) setAllPosts(localArticles);
       } finally {
         if (!cancelled) setLoading(false);
       }
     }
 
-    load();
+    loadAll();
     return () => {
       cancelled = true;
     };
-  }, [active, localArticles, paramName]);
+  }, [localArticles]);
+
+  useEffect(() => {
+    if (!active) {
+      setPosts(allPosts);
+      return;
+    }
+    const filtered = allPosts.filter(
+      (p) => String(p.categoryId) === String(active)
+    );
+    setPosts(filtered);
+  }, [active, allPosts]);
+
+  // reset to first page whenever filter/posts change
+  useEffect(() => {
+    setPage(1);
+  }, [active, allPosts.length]);
 
   function onSelect(id: string) {
     setActive(id);
@@ -85,21 +82,21 @@ export default function CategoryTabs({
     else url.searchParams.set(paramName, id);
     router.push(url.pathname + url.search);
   }
+  const fallbackImg =
+    "https://hiepkiem.inplay.vn/_next/image?url=%2Fassets%2Fimages%2Fbanner-main%2Fbackground-banner-main.jpg&w=1200&q=75";
+  const isValidHttpUrl = (value?: string) => {
+    if (!value) return false;
+    try {
+      const u = new URL(value);
+      return u.protocol === "http:" || u.protocol === "https:";
+    } catch {
+      return false;
+    }
+  };
 
   return (
     <div>
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        <button
-          onClick={() => onSelect("")}
-          className={`rounded px-3 py-1 text-sm font-medium transition-colors ${
-            active === ""
-              ? "bg-blue-600 text-white"
-              : "bg-white/80 text-gray-800 hover:bg-white"
-          }`}
-        >
-          Tất cả
-        </button>
-
         {categories?.map((c) => (
           <button
             key={c.id}
@@ -116,38 +113,107 @@ export default function CategoryTabs({
       </div>
 
       <div className="space-y-4">
-        {loading ? (
-          <div className="text-sm text-gray-500">Đang tải...</div>
-        ) : posts.length === 0 ? (
+        {loading && <div className="text-sm text-gray-500">Đang tải...</div>}
+        {!loading && posts.length === 0 && (
           <div className="text-sm text-gray-500">Không có bài viết.</div>
-        ) : (
-          posts.map((a) => (
-            <Link
-              key={a.id}
-              href={`/news/${a.id}`}
-              className="flex gap-4 rounded border border-gray-200 bg-white p-4 shadow-sm"
-            >
-              <img
-                src={a.image}
-                alt={a.title}
-                className="h-28 w-40 flex-none rounded object-cover"
-              />
-              <div className="flex flex-1 flex-col">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="h-2 w-2 rounded-full bg-pink-500" />
-                    <time className="text-sm text-gray-500">{a.time}</time>
+        )}
+        {!loading && posts.length > 0 && (
+          <>
+            {posts.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((p) => {
+              const imgSrc = isValidHttpUrl(p.img as string)
+                ? (p.img as string)
+                : fallbackImg;
+              if (!isValidHttpUrl(p.img as string)) {
+                console.warn(
+                  "CategoryTabs: invalid image src, using fallback:",
+                  p.img,
+                  "for post",
+                  p.id
+                );
+              }
+
+              return (
+                <Link
+                  key={p.id}
+                  href={`/news/${p.id}`}
+                  className="flex gap-4 rounded border border-gray-200 bg-white p-4 shadow-sm"
+                >
+                  <img
+                    src={imgSrc}
+                    alt={p.programName}
+                    height={200}
+                    width={200}
+                    className="h-28 w-40 flex-none rounded object-cover"
+                  />
+                  <div className="flex flex-1 flex-col">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="h-2 w-2 rounded-full bg-pink-500" />
+                        <time className="text-sm text-gray-500">
+                          {formatDate(p.createTime, { relative: true })}
+                        </time>
+                      </div>
+                    </div>
+                    <h3 className="mt-2 text-lg font-semibold text-gray-900 hover:underline">
+                      {p.programName}
+                    </h3>
+                    <p className="mt-2 text-sm line-clamp-1 max-h-10  text-gray-600 flex-1">
+                      {p.depcription}
+                    </p>
                   </div>
-                </div>
-                <h3 className="mt-2 text-lg font-semibold text-gray-900 hover:underline">
-                  {a.title}
-                </h3>
-                <p className="mt-2 text-sm text-gray-600 flex-1">{a.excerpt}</p>
-              </div>
-            </Link>
-          ))
+                </Link>
+              );
+            })}
+          </>
         )}
       </div>
+      {/* pagination controls */}
+      {!loading && posts.length > PAGE_SIZE && (
+        <div className="mt-4 flex items-center justify-between">
+          <div className="text-sm text-gray-600">
+            Hiển thị {Math.min((page - 1) * PAGE_SIZE + 1, posts.length)} -{" "}
+            {Math.min(page * PAGE_SIZE, posts.length)} / {posts.length}
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="px-3 py-1 rounded border bg-white text-gray-700 hover:bg-orange-50 disabled:opacity-50"
+            >
+              Prev
+            </button>
+            {Array.from({ length: Math.ceil(posts.length / PAGE_SIZE) }).map(
+              (_, idx) => {
+                const pNum = idx + 1;
+                return (
+                  <button
+                    key={pNum}
+                    onClick={() => setPage(pNum)}
+                    className={`px-3 py-1 rounded ${
+                      pNum === page
+                        ? "bg-orange-600 text-white"
+                        : "border text-gray-700 hover:bg-orange-50"
+                    }`}
+                  >
+                    {pNum}
+                  </button>
+                );
+              }
+            )}
+            <button
+              onClick={() =>
+                setPage((p) =>
+                  Math.min(Math.ceil(posts.length / PAGE_SIZE), p + 1)
+                )
+              }
+              disabled={page >= Math.ceil(posts.length / PAGE_SIZE)}
+              className="px-3 py-1 rounded border bg-white text-gray-700 hover:bg-orange-50 disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

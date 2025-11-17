@@ -66,7 +66,6 @@ export function updateUser(partial: Partial<User>): User | null {
   return auth.user;
 }
 
-// utility: save with TTL (minutes)
 export function saveAuthWithTTL(data: AuthData, ttlMinutes: number) {
   const expiresAt = Date.now() + ttlMinutes * 60 * 1000;
   saveAuth({ ...data, expiresAt });
