@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\Ngo_Project3_Api.props" />
+</Project>

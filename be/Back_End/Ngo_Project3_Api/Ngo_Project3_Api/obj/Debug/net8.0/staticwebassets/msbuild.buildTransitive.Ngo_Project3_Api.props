@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\buildMultiTargeting\Ngo_Project3_Api.props" />
+</Project>
