@@ -5,6 +5,7 @@ import Link from "next/link";
 import { APIPost } from "@/services/APIPost";
 import { Post as PostType } from "@/types/Post";
 import { formatDate } from "@/Utils/formatDate";
+import Image from "next/image";
 
 export default function CategoryTabs({
   localArticles = [],
@@ -84,15 +85,15 @@ export default function CategoryTabs({
   }
   const fallbackImg =
     "https://hiepkiem.inplay.vn/_next/image?url=%2Fassets%2Fimages%2Fbanner-main%2Fbackground-banner-main.jpg&w=1200&q=75";
-  const isValidHttpUrl = (value?: string) => {
-    if (!value) return false;
-    try {
-      const u = new URL(value);
-      return u.protocol === "http:" || u.protocol === "https:";
-    } catch {
-      return false;
-    }
-  };
+  // const isValidHttpUrl = (value?: string) => {
+  //   if (!value) return false;
+  //   try {
+  //     const u = new URL(value);
+  //     return u.protocol === "http:" || u.protocol === "https:";
+  //   } catch {
+  //     return false;
+  //   }
+  // };
 
   return (
     <div>
@@ -120,17 +121,17 @@ export default function CategoryTabs({
         {!loading && posts.length > 0 && (
           <>
             {posts.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map((p) => {
-              const imgSrc = isValidHttpUrl(p.img as string)
-                ? (p.img as string)
-                : fallbackImg;
-              if (!isValidHttpUrl(p.img as string)) {
-                console.warn(
-                  "CategoryTabs: invalid image src, using fallback:",
-                  p.img,
-                  "for post",
-                  p.id
-                );
-              }
+              // const imgSrc = isValidHttpUrl(p.img as string)
+              //   ? (p.img as string)
+              //   : fallbackImg;
+              // if (!isValidHttpUrl(p.img as string)) {
+              //   console.warn(
+              //     "CategoryTabs: invalid image src, using fallback:",
+              //     p.img,
+              //     "for post",
+              //     p.id
+              //   );
+              // }
 
               return (
                 <Link
@@ -138,8 +139,8 @@ export default function CategoryTabs({
                   href={`/news/${p.id}`}
                   className="flex gap-4 rounded border border-gray-200 bg-white p-4 shadow-sm"
                 >
-                  <img
-                    src={imgSrc}
+                  <Image
+                    src={p.img || fallbackImg}
                     alt={p.programName}
                     height={200}
                     width={200}
