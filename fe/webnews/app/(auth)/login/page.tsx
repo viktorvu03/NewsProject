@@ -3,6 +3,9 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Header from "@/components/header";
+import APIUser from "@/services/APIUser";
+import { UserLoginReuest } from "@/types/User";
+import { saveAuth } from "@/Utils/MangerLocalStorage";
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -16,18 +19,23 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+      const payload: UserLoginReuest = {
+        user: email,
+        password: password,
+      };
 
-      if (!res.ok) {
-        const payload = await res.json().catch(() => ({}));
-        throw new Error(payload?.message || "Đăng nhập thất bại");
+      const result = await APIUser.login(payload);
+
+      // Expecting user object on success
+      if (!result || !result.userName) {
+        throw new Error("Đăng nhập thất bại");
       }
 
-      router.push("/admin");
+      // Save to localStorage using saveAuth
+      saveAuth({ user: result });
+
+      // Redirect to home (Tổng hợp)
+      router.push("/");
     } catch (err: unknown) {
       const message =
         err instanceof Error
@@ -36,7 +44,6 @@ export default function LoginPage() {
           ? err
           : "Có lỗi xảy ra";
       setError(message);
-      router.push("/admin");
     } finally {
       setLoading(false);
     }
@@ -57,9 +64,9 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <label className="block">
-              <span className="text-sm text-gray-600">Email</span>
+              <span className="text-sm text-gray-600">Tên đăng nhập</span>
               <input
-                type="email"
+                type=""
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}

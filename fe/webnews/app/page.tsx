@@ -3,95 +3,19 @@ import React from "react";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import CategoryTabs from "@/components/CategoryTabs";
-type Article = {
-  id: number;
-  title: string;
-  excerpt: string;
-  time: string;
-  image: string;
-};
+import { Post } from "@/types/Post";
+import { APIPost } from "@/services/APIPost";
+import Link from "next/link";
 
-const articles: Article[] = [
-  {
-    id: 1,
-    title: "'Người mua hàng tin vào người nổi tiếng hơn tem kiểm định'",
-    excerpt:
-      "Theo Phó trưởng đoàn đại biểu Tây Ninh, người mua hàng tin vào người nổi tiếng hơn tem kiểm định nên cần kiểm soát chặt việc livestream của nhóm này.",
-    time: "33' trước",
-    image:
-      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800&q=60&auto=format&fit=crop",
-  },
-  {
-    id: 2,
-    title: "Vỡ mộng với giấc mơ vừa đi làm vừa du lịch châu Âu",
-    excerpt:
-      "Nữ du khách Anh Charlotte Grainger chuyển đến Bồ Đào Nha sống thử như một dân du mục số, nhưng thực tế khiến cô vỡ mộng.",
-    time: "33' trước",
-    image:
-      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800&q=60&auto=format&fit=crop",
-  },
-  {
-    id: 3,
-    title: "Anh rơi ra gầm tàu khi trèo xuống thang rút hành lý",
-    excerpt:
-      "Một hành khách gặp sự cố khi cố trèo xuống khu vực chứa hành lý và bị ngã xuống ray, may mắn không nguy hiểm đến tính mạng.",
-    time: "1h trước",
-    image:
-      "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=800&q=60&auto=format&fit=crop",
-  },
-  {
-    id: 4,
-    title: "Anh rơi ra gầm tàu khi trèo xuống thang rút hành lý",
-    excerpt:
-      "Một hành khách gặp sự cố khi cố trèo xuống khu vực chứa hành lý và bị ngã xuống ray, may mắn không nguy hiểm đến tính mạng.",
-    time: "1h trước",
-    image:
-      "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=800&q=60&auto=format&fit=crop",
-  },
-  {
-    id: 5,
-    title: "Anh rơi ra gầm tàu khi trèo xuống thang rút hành lý",
-    excerpt:
-      "Một hành khách gặp sự cố khi cố trèo xuống khu vực chứa hành lý và bị ngã xuống ray, may mắn không nguy hiểm đến tính mạng.",
-    time: "1h trước",
-    image:
-      "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=800&q=60&auto=format&fit=crop",
-  },
-  {
-    id: 6,
-    title: "Anh rơi ra gầm tàu khi trèo xuống thang rút hành lý",
-    excerpt:
-      "Một hành khách gặp sự cố khi cố trèo xuống khu vực chứa hành lý và bị ngã xuống ray, may mắn không nguy hiểm đến tính mạng.",
-    time: "1h trước",
-    image:
-      "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=800&q=60&auto=format&fit=crop",
-  },
-  {
-    id: 7,
-    title: "Anh rơi ra gầm tàu khi trèo xuống thang rút hành lý",
-    excerpt:
-      "Một hành khách gặp sự cố khi cố trèo xuống khu vực chứa hành lý và bị ngã xuống ray, may mắn không nguy hiểm đến tính mạng.",
-    time: "1h trước",
-    image:
-      "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=800&q=60&auto=format&fit=crop",
-  },
-  {
-    id: 8,
-    title: "Anh rơi ra gầm tàu khi trèo xuống thang rút hành lý",
-    excerpt:
-      "Một hành khách gặp sự cố khi cố trèo xuống khu vực chứa hành lý và bị ngã xuống ray, may mắn không nguy hiểm đến tính mạng.",
-    time: "1h trước",
-    image:
-      "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=800&q=60&auto=format&fit=crop",
-  },
-];
+export default async function Home() {
+  const posts: Post[] = await APIPost.getAllPost().catch(() => []);
 
-export default function Home() {
   return (
     <div>
       <Header />
       <main className="min-h-screen bg-gray-100 text-gray-900 font-sans">
         <header className="bg-linear-to-r from-orange-600 to-orange-400 text-white">
+          {/* đây là banner */}
           <div className="mx-auto max-w-6xl px-6 py-12">
             <div className="flex items-center justify-between gap-6">
               <div className="flex-1">
@@ -200,7 +124,7 @@ export default function Home() {
               </div>
 
               <div className="space-y-6">
-                <CategoryTabs localArticles={articles} />
+                <CategoryTabs localArticles={posts} />
               </div>
             </section>
 
@@ -225,11 +149,23 @@ export default function Home() {
                 </div>
 
                 <div className="rounded border border-gray-200 bg-white p-4 shadow-sm">
-                  <h4 className="mb-3 text-sm font-semibold">Tin nổi bật</h4>
+                  <h4 className="mb-3 text-xs font-semibold">Tin nổi bật</h4>
                   <ul className="space-y-2 text-sm text-gray-700">
-                    <li>- Giá xăng tăng nhẹ</li>
-                    <li>- Tuyển sinh đại học: Lưu ý thay đổi</li>
-                    <li>- Công nghệ: AI và tương lai</li>
+                    {posts && posts.length > 0 ? (
+                      posts.slice(0, 5).map((p) => (
+                        <li
+                          className="hover:font-bold hover:scale-105 hover:underline duration-300"
+                          key={p.id}
+                        >
+                          <Link href={`/news/${p.id}`}>
+                            {" "}
+                            - {p.programName ?? "(Untitled)"}
+                          </Link>
+                        </li>
+                      ))
+                    ) : (
+                      <li>Không có bài viết nổi bật</li>
+                    )}
                   </ul>
                 </div>
               </div>

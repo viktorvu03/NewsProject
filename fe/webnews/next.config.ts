@@ -2,8 +2,12 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    // cách đơn giản
-    domains: ["images.unsplash.com"],
+    // cho phép các host ảnh bên ngoài mà app dùng (unsplash, placeholder, và backend CDN)
+    domains: [
+      "images.unsplash.com",
+      "via.placeholder.com",
+      "hiepkieim.inplay.vn",
+    ],
 
     // hoặc dùng remotePatterns (chi tiết hơn)
     // remotePatterns: [

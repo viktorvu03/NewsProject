@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Header from "@/components/header";
+import APIUser from "@/services/APIUser";
+import { UserRegisReuest } from "@/types/User";
 
 function getErrorMessage(err: unknown): string {
   if (err instanceof Error) return err.message;
@@ -44,20 +46,27 @@ export default function RegisterPage() {
 
     setLoading(true);
     try {
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
-      });
+      const now = new Date().toISOString();
+      const payload: UserRegisReuest = {
+        id: 0,
+        fullName: name || "",
+        userName: email.split("@")[0] || email || "user",
+        email: email,
+        password: password,
+        role: "user",
+        status: "active",
+        createTime: now,
+        updateTime: now,
+      };
 
-      if (!res.ok) {
-        const payload = await res.json().catch(() => ({}));
-        throw new Error(payload?.message || "Đăng ký thất bại");
+      const result = await APIUser.register(payload);
+
+      if (!result || result.code !== "00") {
+        throw new Error(result?.error || "Đăng ký thất bại");
       }
 
       setSuccess("Đăng ký thành công. Chuyển đến trang đăng nhập...");
-      // redirect to login after short delay
-      setTimeout(() => router.push("/(login)/login"), 800);
+      setTimeout(() => router.push("/login"), 800);
     } catch (err: unknown) {
       setError(getErrorMessage(err));
     } finally {
