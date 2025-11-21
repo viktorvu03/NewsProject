@@ -7,11 +7,7 @@ import {
 } from "@/types/Evaluation";
 import { getAuth } from "@/Utils/MangerLocalStorage";
 
-export default function EvaluationSection({
-  postId,
-}: {
-  postId?: number | string;
-}) {
+export default function EvaluationSection({ postId }: { postId: number }) {
   const [items, setItems] = useState<getEvaluataionResponse[]>([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -22,11 +18,18 @@ export default function EvaluationSection({
   async function load() {
     setLoading(true);
     try {
+      console.log("bắt đầu load arra:", postId);
       const data = await APIEvaluations.getAllEvaluataion();
-      if (Array.isArray(data)) setItems(data as getEvaluataionResponse[]);
-      else setItems([]);
+      if (Array.isArray(data)) {
+        console.log("đây là data", data);
+        const arrayFilter: getEvaluataionResponse[] = data.filter(
+          (x) => x.programId == postId
+        );
+        console.log("đây là load arra:", arrayFilter);
+        setItems(arrayFilter);
+      } else setItems([]);
     } catch (err) {
-      console.error("load evaluations failed", err);
+      console.error("lỗi load binh luan", err);
       setItems([]);
     } finally {
       setLoading(false);
@@ -48,6 +51,7 @@ export default function EvaluationSection({
       const payload: createEvaluationRequest = {
         id: 0,
         userName: String(userName),
+        programId: postId,
         rating: Number(rating),
         depcription: text || "",
         createTime: now,
@@ -56,7 +60,7 @@ export default function EvaluationSection({
 
       const res = await APIEvaluations.createEvaluation(payload);
       if (!res || res.code !== "00") {
-        throw new Error(res?.error || "Gửi đánh giá thất bại");
+        throw new Error(res?.error || "Gửi bình luận thất bại");
       }
 
       setText("");
@@ -75,7 +79,7 @@ export default function EvaluationSection({
       <h3 className="text-lg font-semibold mb-3">Ý kiến bình luận</h3>
       <form onSubmit={handleSubmit} className="space-y-3 mb-4">
         <div className="flex items-center gap-3">
-          <label className="text-sm">Đánh giá:</label>
+          <label className="text-sm">bình luận:</label>
           <select
             value={rating}
             onChange={(e) => setRating(Number(e.target.value))}
@@ -104,16 +108,16 @@ export default function EvaluationSection({
             disabled={submitting}
             className="bg-orange-500 text-white px-3 py-1 rounded"
           >
-            {submitting ? "Đang gửi..." : "Gửi đánh giá"}
+            {submitting ? "Đang gửi..." : "Gửi bình luận"}
           </button>
         </div>
       </form>
 
       <div>
         {loading ? (
-          <div className="text-sm text-gray-600">Đang tải đánh giá...</div>
+          <div className="text-sm text-gray-600">Đang tải bình luận...</div>
         ) : items.length === 0 ? (
-          <div className="text-sm text-gray-600">Chưa có đánh giá.</div>
+          <div className="text-sm text-gray-600">Chưa có bình luận.</div>
         ) : (
           <ul className="space-y-3">
             {items.map((it) => (

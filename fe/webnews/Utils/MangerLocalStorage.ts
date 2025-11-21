@@ -26,7 +26,7 @@ export function getAuth(): AuthData | null {
     const raw = localStorage.getItem(LS_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as AuthData;
-    // expire check
+    //check hạn
     if (parsed.expiresAt && Date.now() > parsed.expiresAt) {
       clearAuth();
       return null;

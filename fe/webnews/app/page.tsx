@@ -1,5 +1,6 @@
 import Image from "next/image";
 import React from "react";
+import BannerCarousel from "@/components/BannerCarousel";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import CategoryTabs from "@/components/CategoryTabs";
@@ -9,7 +10,8 @@ import Link from "next/link";
 
 export default async function Home() {
   const posts: Post[] = await APIPost.getAllPost().catch(() => []);
-
+  const fallbackImg =
+    "https://dhtn.ttxvn.org.vn/Images/images/Boi%20Duong%20Nghiep%20Vu/Noi%20San%20Thong%20Tan/Nam%202023/So%205/NSTT/18.jpg";
   return (
     <div>
       <Header />
@@ -20,10 +22,13 @@ export default async function Home() {
             <div className="flex items-center justify-between gap-6">
               <div className="flex-1">
                 <div className="mb-3 flex items-center gap-3">
-                  <span className="inline-block rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white">
+                  {/* <span className="inline-block rounded-full  px-3 py-1 text-xs font-semibold text-white">
                     Tin nóng
-                  </span>
-                  <nav className="hidden sm:flex gap-2 text-xs text-white/90">
+                  </span> */}
+                  <nav className="hidden sm:flex gap-2 text-lg font-semibold text-white/90">
+                    <a className="px-2 py-1 rounded hover:bg-white/10">
+                      Tin nóng
+                    </a>
                     <a className="px-2 py-1 rounded hover:bg-white/10">
                       Chính trị
                     </a>
@@ -47,7 +52,7 @@ export default async function Home() {
                   điều tra và góc nhìn chuyên sâu.
                 </p>
 
-                <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+                {/* <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
                   <form className="flex w-full max-w-md items-center gap-2 rounded bg-white/10 p-1 pr-2 backdrop-blur-sm">
                     <input
                       aria-label="Tìm kiếm"
@@ -79,37 +84,13 @@ export default async function Home() {
                       </div>
                     </div>
                   </div>
-                </div>
+                </div> */}
               </div>
 
               <div className="hidden md:block md:w-1/3 lg:w-1/4">
-                <div className="relative overflow-hidden rounded-md shadow-lg">
-                  <Image
-                    src="https://images.unsplash.com/photo-1503264116251-35a269479413?w=1200&q=60&auto=format&fit=crop"
-                    alt="banner"
-                    height={600}
-                    width={800}
-                    className="h-36 w-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent" />
-                  <div className="absolute left-3 bottom-3 right-3 flex items-end justify-between">
-                    <div>
-                      <span className="rounded bg-white/10 px-2 py-1 text-xs font-semibold text-white">
-                        Ảnh sự kiện
-                      </span>
-                      <p className="mt-1 max-w-xs text-sm text-white/90">
-                        Báo cáo đặc biệt: xu hướng truyền thông 2025
-                      </p>
-                    </div>
-                    <div className="flex flex-col items-end gap-2">
-                      <span className="inline-block rounded bg-red-500 px-2 py-1 text-xs font-bold text-white">
-                        HOT
-                      </span>
-                      <span className="hidden sm:inline-block rounded bg-white/10 px-2 py-1 text-xs text-white">
-                        {new Date().toLocaleDateString()}
-                      </span>
-                    </div>
-                  </div>
+                {/* Banner carousel using images from posts */}
+                <div>
+                  <BannerCarousel posts={posts} />
                 </div>
               </div>
             </div>
@@ -132,18 +113,16 @@ export default async function Home() {
               <div className="space-y-6">
                 <div className="rounded border border-gray-200 bg-white p-4 shadow-sm">
                   <Image
-                    src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=60&auto=format&fit=crop"
+                    src={fallbackImg}
                     alt="ad"
                     width={299}
                     height={200}
                     className="w-full rounded object-cover"
                   />
                   <div className="mt-3">
-                    <h4 className="text-sm font-semibold">
-                      SỐNG ĐẦY MỖI BÌNH MINH
-                    </h4>
+                    <h4 className="text-sm font-semibold">TIN TỨC NÓNG HỔI</h4>
                     <p className="mt-1 text-xs text-gray-600">
-                      Giao điểm năng lượng giữa khu đô thị biểu tượng
+                      Giao điểm thông tin thế giới
                     </p>
                   </div>
                 </div>

@@ -14,5 +14,10 @@ const APIEvaluations = {
     const res = await apiClient.post(url, createEvaluationRequest);
     return res.data;
   },
+  getAllEvaluataionByid: async (id: number) => {
+    const url = `/causes/${id}`;
+    const res = await apiClient.get(url);
+    return res.data;
+  },
 };
 export { APIEvaluations };

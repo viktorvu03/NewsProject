@@ -1,6 +1,7 @@
 export type createEvaluationRequest = {
   id: number;
   userName: string;
+  programId: number;
   rating: number;
   depcription: string;
   createTime: string;
@@ -9,6 +10,7 @@ export type createEvaluationRequest = {
 export type getEvaluataionResponse = {
   id: number;
   userName: string;
+  programId: number;
   rating: number;
   depcription: string;
   createTime: string;

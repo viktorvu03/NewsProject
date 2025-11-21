@@ -42,7 +42,6 @@ export default function Header() {
   function onClickCategory(id: string) {
     const paramName = "categoryId";
     const search = id ? `?${paramName}=${encodeURIComponent(id)}` : "";
-    // Always navigate to the posts list (home) with the category query
     router.push(`/${search}`);
   }
 

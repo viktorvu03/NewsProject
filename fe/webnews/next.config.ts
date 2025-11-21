@@ -4,9 +4,10 @@ const nextConfig: NextConfig = {
   images: {
     // cho phép các host ảnh bên ngoài mà app dùng (unsplash, placeholder, và backend CDN)
     domains: [
+      "hiepkiem.inplay.vn",
       "images.unsplash.com",
-      "via.placeholder.com",
-      "hiepkieim.inplay.vn",
+      "cdn.24hmoney.vn",
+      "dhtn.ttxvn.org.vn",
     ],
 
     // hoặc dùng remotePatterns (chi tiết hơn)
