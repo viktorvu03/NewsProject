@@ -285,14 +285,32 @@ namespace Ngo_Project3_Api.Controllers
             using (var connection = new MySqlConnection(_connectionString))
             {
                 await connection.OpenAsync();
-                string query = "UPDATE users SET FULL_NAME = @FullName, EMAIL = @Email, USER_NAME = @UserName, ROLE = @Role, STATUS = @Status, UPDATE_TIME = @UpdateTime WHERE ID = @Id";
+                string passwordOld ="";
+                if (user.Password == "")
+                {
+                    string query1 = "SELECT PASSWORD FROM users WHERE ID = @user";
+                    using (var command1 = new MySqlCommand(query1, connection))
+                    {
+
+                        command1.Parameters.AddWithValue("@user", user.Id);
+                        var result = await command1.ExecuteScalarAsync();
+                            
+                        passwordOld = result.ToString();
+                    }
+
+                }
+
+                string query = "UPDATE users SET FULL_NAME = @FullName, EMAIL = @Email,PASSWORD = @Password, USER_NAME = @UserName, ROLE = @Role, STATUS = @Status, UPDATE_TIME = @UpdateTime WHERE ID = @Id";
                 using (var command = new MySqlCommand(query, connection))
                 {
                     command.Parameters.AddWithValue("@Id", user.Id);
                     command.Parameters.AddWithValue("@FullName", user.FullName);
                     command.Parameters.AddWithValue("@UserName", user.UserName);
                     command.Parameters.AddWithValue("@Email", user.Email);
-//                    command.Parameters.AddWithValue("@Password", EncryptMD5(user.Password));
+                    if(user.Password != "")
+                        command.Parameters.AddWithValue("@Password", MD5Encryption.EncryptMD5(user.Password));
+                    else
+                        command.Parameters.AddWithValue("@Password", passwordOld);
                     command.Parameters.AddWithValue("@Role", user.Role);
                     command.Parameters.AddWithValue("@Status", user.Status);
                     command.Parameters.AddWithValue("@UpdateTime", DateTime.UtcNow);
