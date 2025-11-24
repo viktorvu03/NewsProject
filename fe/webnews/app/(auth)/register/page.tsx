@@ -79,7 +79,7 @@ export default function RegisterPage() {
     <>
       <Header />
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
-        <div className="w-full max-w-md -translate-y-1/6 bg-white rounded-lg shadow px-8 py-10">
+        <div className="w-full max-w-md -mt-2 bg-white rounded-lg shadow px-8 py-10">
           <h1 className="text-2xl font-semibold mb-4">Đăng ký</h1>
 
           {error && (
@@ -114,13 +114,13 @@ export default function RegisterPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="mt-1 w-full rounded border-gray-200 shadow-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
-                placeholder="you@example.com"
+                placeholder="Nhập email"
               />
             </label>
             <label className="block">
               <span className="text-sm text-gray-600">User Name</span>
               <input
-                type="email"
+                type=""
                 required
                 value={username}
                 onChange={(e) => setUserName(e.target.value)}
@@ -164,10 +164,7 @@ export default function RegisterPage() {
 
           <div className="mt-4 text-sm text-gray-600">
             Đã có tài khoản?{" "}
-            <Link
-              href="/(login)/lgoin"
-              className="text-orange-600 hover:underline"
-            >
+            <Link href="/login" className="text-orange-600 hover:underline">
               Đăng nhập
             </Link>
           </div>

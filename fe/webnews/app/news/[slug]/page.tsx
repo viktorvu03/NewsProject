@@ -1,5 +1,5 @@
 // ...existing code...
-import React from "react";
+import React, { Suspense } from "react";
 import Link from "next/link";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
@@ -56,23 +56,15 @@ export default async function Page({
 
   const fallbackImg =
     "https://hiepkiem.inplay.vn/_next/image?url=%2Fassets%2Fimages%2Fbanner-main%2Fbackground-banner-main.jpg&w=1200&q=75";
-  // const isValidHttpUrl = (value?: string) => {
-  //   if (!value) return false;
-  //   try {
-  //     const u = new URL(value);
-  //     return u.protocol === "http:" || u.protocol === "https:";
-  //   } catch {
-  //     return false;
-  //   }
-  // };
 
   return (
     <div>
-      <Header />
+      <Suspense fallback={<div>Loading...</div>}>
+        <Header />
+      </Suspense>
       <main className="max-w-6xl mx-auto p-6">
-        {/* <div className="grid grid-cols-1 md:grid-cols-3 bg-black gap-8"> */}
-        <div className="w-full flex justify-center items-center">
-          <article className="md:col-span-2 max-w-3xl">
+        <div className="w-full flex gap-5 justify-center items-start">
+          <article className="md:col-span-2 max-w-3xl min-w-2xl">
             <h1 className="text-2xl font-bold mb-2">{post.programName}</h1>
             <time className="text-sm text-gray-500">{post.createTime}</time>
             <Image
@@ -88,8 +80,8 @@ export default async function Page({
             <EvaluationSection postId={post.id} />
           </article>
 
-          <aside className="absolute right-0 top-40 max-w-1xl bg-background  ">
-            <div className="rounded border border-gray-200 bg-white p-4 shadow-sm">
+          <div className="sticky top-4 h-fit flex flex-col items-start">
+            <div className="rounded border border-gray-200 p-4 shadow-sm">
               <h4 className="mb-3 text-sm font-semibold">
                 Bài viết cùng chuyên mục
               </h4>
@@ -114,7 +106,7 @@ export default async function Page({
                           className="h-16 w-24 rounded object-cover flex-none"
                         />
                         <div className="flex-1">
-                          <div className="text-sm font-medium text-gray-900 max-w-xs line-clamp-1">
+                          <div className="text-sm font-medium text-gray-900 max-w-xl line-clamp-1">
                             {r.programName}
                           </div>
                           <div className="text-xs text-gray-500">
@@ -129,7 +121,7 @@ export default async function Page({
                 })}
               </ul>
             </div>
-          </aside>
+          </div>
         </div>
       </main>
       <Footer />
